@@ -14,3 +14,8 @@ for x in data:
         total += int(x)
 
 print(max(elves))
+
+
+elves.sort()
+elves.reverse()
+print(sum(sum(elves[:3])))
