@@ -1,27 +1,21 @@
 #!/usr/bin/env python3
 
-rps_mine = {
-    'X': 1, # rock
-    'Y': 2, # paper
-    'Z': 3  # scissors
-}
-
-me = {
-    'X': 'rock',
-    'Y': 'paper',
-    'Z': 'scissors'
-}
-
-elves = {
+plays = {
     'A': 'rock',
     'B': 'paper',
     'C': 'scissors'
 }
 
 can_beat = {
-    'X': 'C',
-    'Z': 'B',
-    'Y': 'A'
+    'A': 'C',
+    'B': 'A',
+    'C': 'B'
+}
+
+need_to_do = {
+    'X': 'lose',
+    'Y': 'draw',
+    'Z': 'win'
 }
 
 with open("data_day2.txt") as data_file:
@@ -34,20 +28,28 @@ draws = 0
 
 for x in data:
     (elf, mine) = x
-    total_score += rps_mine[mine]
-    print(f"\nplay {me[mine]} against {elves[elf]}")
-    print(f"{me[mine]} can beat {elves[can_beat[mine]]}")
-    if elf == can_beat[mine]:
-        total_score += 6
+    my_play = None
+    if mine == 'Z':
         wins += 1
-        print("won")
-    elif me[mine] == elves[elf]:
-        total_score += 3
+        total_score += 6
+        for play in plays:
+            if can_beat[play] == elf:
+                my_play = play
+                print(f"\n{plays[play]} beats {plays[elf]}")
+    elif mine == 'Y':
         draws += 1
-        print("draw")
+        my_play = elf
+        total_score += 3
     else:
         losses += 1
-        print("lost")
+        my_play = can_beat[elf]
+        print(f"\n{plays[my_play]} loses to {plays[elf]}")
+    
+    for score, play in enumerate(('A', 'B', 'C'), 1):
+        if play == my_play:
+            total_score += score
+    
+    print(f"\nplay {plays[my_play]} against {plays[elf]} when I should {need_to_do[mine]}")
 
 print(f"\n\nlosses: {losses} wins: {wins} draws: {draws}")
 print(f"\ntotal score: {total_score}")
