@@ -24,11 +24,9 @@ for row in stack_rows:
             stacks[idx].append(val)
 
 for amt, from_s, to_s in moves:
-    print(stacks[from_s-1])
-    print(stacks[to_s-1])
-    for _ in range(amt):
-        c = stacks[from_s-1].pop()
-        stacks[to_s-1].append(c)
+    to_move = stacks[from_s-1][-amt:]
+    stacks[from_s-1] = stacks[from_s-1][:-amt]
+    stacks[to_s-1] += to_move
 
 final_message = ''.join([s.pop() for s in stacks])
 print(final_message)
