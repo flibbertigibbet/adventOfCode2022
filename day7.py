@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 MAX_SIZE = 100000
+TOTAL_SPACE = 70000000
+NEED_SPACE = 30000000
 
 with open("data_day7.txt") as data_file:
     data = [x.strip() for x in data_file]
@@ -46,3 +48,14 @@ for d in dirs:
 
 print(f'\n\ntotal matching directory size: {total_dir_size}')
 
+# part 2
+empty = TOTAL_SPACE - sum_dir_size('/')
+need = NEED_SPACE - empty
+
+smallest = TOTAL_SPACE
+for d in dirs:
+    dirsize = sum_dir_size(d)
+    if dirsize >= need and dirsize < smallest:
+        smallest = dirsize
+
+print(f"\n\nSmallest directory with {need} space free is {smallest}")
