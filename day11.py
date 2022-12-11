@@ -3,7 +3,7 @@
 with open("data_day11.txt") as data_file:
     data = [x.strip() for x in data_file]
 
-ROUNDS = 20
+ROUNDS = 10000
 monkeys = []
 monkey = None
 for x in data:
@@ -29,6 +29,10 @@ for x in data:
 if monkey:
     monkeys.append(monkey)
 
+common = 1
+for monkey in monkeys:
+    common *= monkey['test']
+
 for _ in range(0, ROUNDS):
     for monkey in monkeys:
         for item in monkey['items']:
@@ -39,15 +43,15 @@ for _ in range(0, ROUNDS):
             else:
                 item *= monkey['op_amt']
             
-            item //= 3
-
+            # item //= 3
             if item % monkey['test'] == 0:
-                monkeys[monkey['true_monkey']]['items'].append(item)
+                monkeys[monkey['true_monkey']]['items'].append(item % common)
             else:
-                monkeys[monkey['false_monkey']]['items'].append(item)
-
-            monkey['items'] = []
+                monkeys[monkey['false_monkey']]['items'].append(item % common)
+            
             monkey['total_inspections'] += 1
+
+        monkey['items'] = []
 
 insp = [m['total_inspections'] for m in monkeys]
 insp.sort()
