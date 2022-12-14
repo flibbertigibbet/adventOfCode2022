@@ -29,6 +29,12 @@ for p in points:
 
 print(f"min x {min_x} max x {max_x} min y {min_y} max y {max_y}")
 
+min_x -=2000
+max_x +=2000
+
+max_y = max_y + 2  # floor
+points.append([(min_x, max_y), (max_x, max_y)])
+
 cave = [['.'] * (max_x - min_x + 1) for x in range(min_y, max_y + 1)]
 
 def print_cave():
@@ -73,6 +79,9 @@ def settle(from_x, from_y):
     if from_x < min_x or from_x+1 > max_x or from_y < min_y or from_y+1 > max_y:
         print(f'cave is full. {from_x},{from_y}')
         return -1  # cave is full
+    
+    if cave[ORIGIN_Y-min_y][ORIGIN_X-min_x] == 'o':
+        return -1  # source is blocked
     
     print(f'settle {from_x},{from_y}')
     if cave[from_y+1-min_y][from_x-min_x] == '.':
