@@ -3,9 +3,7 @@
 with open("data_day15test.txt") as data_file:
     data = [x.strip() for x in data_file]
 
-CHECK_Y = 2000000
-
-MAX_RANGE = 10
+CHECK_ROW = 10 #2000000
 
 readings = []
 for x in data:
@@ -18,14 +16,13 @@ for x in data:
     beacon_y = int(beacon_y.strip().strip('y='))
     readings.append(((sensor_x, sensor_y), (beacon_x, beacon_y)))
     
-print(f'done {readings}')
+print(f'read {readings}')
 
 
 min_x = 0
 min_y = 0
 max_x = 0
 max_y = 0
-
 
 for p in readings:
     for x, y in p:
@@ -47,29 +44,26 @@ min_y -= 10
 max_y += 10
 print(f"min x {min_x} max x {max_x} min y {min_y} max y {max_y}")
 
-cave = [['.'] * (max_x - min_x + 1) for x in range(min_y, max_y + 1)]
-
-def print_cave():
-    print('\n\n')
-    for c in cave:
-        for s in c:
-            print(s, end='')
-        
-        print('')
-
+max_dist = 0
+sensors = []
+filled = {}
 for sensor, beacon in readings:
-    print(f'\nsensor is {sensor}')
-    print(f'beacon is {beacon}')
-    cave[sensor[1]-min_y][sensor[0]-min_x] = 'S'
-    cave[beacon[1]-min_y][beacon[0]-min_x] = 'B'
+    sensors.append(sensor)
+    filled[f'{sensor[1]-min_y}:{sensor[0]-min_x}'] = 'S'
+    filled[f'{beacon[1]-min_y}:{beacon[0]-min_x}'] = 'B'
+    max_range = abs(beacon[0] - sensor[0]) + abs(beacon[1] - sensor[1]) + 1
+    if max_range > max_dist:
+        max_dist = max_range
 
-print_cave()
+print(f'Max distance is {max_dist}')
 
-def sensor_range(sensor):
-    box_x_min = sensor[0] - MAX_RANGE
-    box_x_max = sensor[0] + MAX_RANGE
-    box_y_min = sensor[1] - MAX_RANGE
-    box_y_max = sensor[1] + MAX_RANGE
+def sensor_range(sensor, beacon):
+    max_range = abs(beacon[0] - sensor[0]) + abs(beacon[1] - sensor[1]) + 1
+    print(f'Max range of sensor {sensor} is {max_range}')
+    box_x_min = sensor[0] - max_range
+    box_x_max = sensor[0] + max_range
+    box_y_min = sensor[1] - max_range
+    box_y_max = sensor[1] + max_range
     for x in range(box_x_min, box_x_max + 1):
         for y in range(box_y_min, box_y_max + 1):
             cy = y - min_y
@@ -77,9 +71,34 @@ def sensor_range(sensor):
 
             if cy >= 0 and cx >= 0:
                 dist = abs(x - sensor[0]) + abs(y - sensor[1])
-                print(f'distance to {x},{y} is {dist}')
-                if cave[cy][cx] == '.' and dist < MAX_RANGE:
-                    cave[cy][cx] = '#'
+                #print(f'distance to {x},{y} is {dist}')
+                #cave[cy][cx] == '.'
+                if f'{cy}:{cx}' not in filled and dist < max_range:
+                    filled[f'{cy}:{cx}'] = '#'
 
-sensor_range((8, 7))
-print_cave()
+min_row = CHECK_ROW - max_dist
+max_row = CHECK_ROW + max_dist
+for sensor, beacon in readings:
+    if sensor[1] >= min_row and sensor[1] <= max_row:
+        print(f'sensor {sensor} is in range {min_row}-{max_row}')
+        sensor_range(sensor, beacon)
+    else:
+        print(f'skipping out-of-range sensor {sensor}')
+
+no_beacon = 0
+for i in range(min_y, max_y):
+    if f'{i}:{CHECK_ROW-min_y}' in filled:
+        no_beacon += 1
+
+def print_filled():
+    for i, x in enumerate(range(min_x, max_x-min_x+1)):
+        print(f'\n{i}'.ljust(4, ' '), end='')
+        for y in range(0, max_y-min_y+1):
+            if f'{x}:{y}' in filled:
+                print(filled[f'{x}:{y}'], end='')
+            else:
+                print('.', end='')
+
+print_filled()
+print(f'\n\n{no_beacon} spots on row {CHECK_ROW} with no beacon\n')
+
